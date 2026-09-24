@@ -1,20 +1,24 @@
-import sys, math
+import argparse
 
-def main():
-    match sys.argv[1]:
-        case 'add':
-            nums = [int(x) for x in sys.argv[2:]]
-            print(sum(nums))
 
-        case 'multiply':
-            nums = [int(x) for x in sys.argv[2:]]
-            print(math.prod(nums))
+def main(args=None):
+    parser = argparse.ArgumentParser()
 
-        case 'hello':
-            print('Bob')
+    parser.add_argument('--name', type=str, required=True)
+    parser.add_argument('--age', type=int, required=True)
+    parser.add_argument('--verbose', action='store_true')
 
-        case _:
-            print('Unknown command')
+    args = parser.parse_args(args)
+
+    if args.verbose:
+        print("Hello,", args.name)
+
+    print("You are", args.age, "years old")
+    if args.age in range(1, 3):
+        print("You are newborn")
+    if args.age in range(3, 6):
+        print("You are preschooler")
+    ...
 
 if __name__ == '__main__':
     main()

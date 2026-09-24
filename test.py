@@ -1,33 +1,28 @@
-import sys
-import cli
-
-def test_add(monkeypatch, capsys):
-    monkeypatch.setattr(sys, 'argv', ['cli.py', 'add', '1', '2', '3'])
-
-    cli.main()
-
-    assert capsys.readouterr().out == '6\n'
+import cli, pytest
 
 
-def test_multiply(monkeypatch, capsys):
-    monkeypatch.setattr(sys, 'argv', ['cli.py', 'multiply', '2', '3', '4'])
-
-    cli.main()
-
-    assert capsys.readouterr().out == '24\n'
+#case -- python cli.py --name Bob
+def test_only_one_argument(capsys):
+    with pytest.raises(SystemExit):
+        cli.main(['--name', 'Bob'])
 
 
-def test_hello(monkeypatch, capsys):
-    monkeypatch.setattr(sys, 'argv', ['cli.py', 'hello'])
+#case -- python cli.py --name Bob --age 25
+def test_two_right_arguments(capsys):
+    cli.main(['--name', 'Bob', '--age', '25' ])
 
-    cli.main()
-
-    assert capsys.readouterr().out == 'Bob\n'
+    assert capsys.readouterr().out == 'You are 25 years old\n'
 
 
-def test_unknown_command(monkeypatch, capsys):
-    monkeypatch.setattr(sys, 'argv', ['cli.py', 'kek'])
+#case -- python cli.py --name Bob --age 25 --verbose
+def test_verbose(capsys):
+    cli.main(['--name', 'Bob', '--age', '25', '--verbose'])
 
-    cli.main()
+    assert capsys.readouterr().out == ('Hello, Bob\n'
+                                       'You are 25 years old\n')
 
-    assert capsys.readouterr().out == 'Unknown command\n'
+
+#case -- python cli.py
+def test_no_arguments():
+    with pytest.raises(SystemExit):
+        cli.main()
