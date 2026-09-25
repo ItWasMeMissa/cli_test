@@ -1,28 +1,60 @@
 import cli, pytest
 
-
-#case -- python cli.py --name Bob
-def test_only_one_argument(capsys):
-    with pytest.raises(SystemExit):
-        cli.main(['--name', 'Bob'])
-
-
-#case -- python cli.py --name Bob --age 25
-def test_two_right_arguments(capsys):
-    cli.main(['--name', 'Bob', '--age', '25' ])
-
-    assert capsys.readouterr().out == 'You are 25 years old\n'
-
-
-#case -- python cli.py --name Bob --age 25 --verbose
-def test_verbose(capsys):
-    cli.main(['--name', 'Bob', '--age', '25', '--verbose'])
-
-    assert capsys.readouterr().out == ('Hello, Bob\n'
-                                       'You are 25 years old\n')
-
-
-#case -- python cli.py
-def test_no_arguments():
+#case python cli.py
+def test_convertor():
     with pytest.raises(SystemExit):
         cli.main()
+
+
+#case python cli.py --value 100 --from km --to miles
+def test_convertor_with_args(capsys):
+    cli.main([
+        '--value', '100',
+        '--from', 'km',
+        '--to', 'miles'
+    ])
+
+    assert capsys.readouterr().out == (
+        '100 km = 62.14 miles\n'
+    )
+
+
+#case python cli.py --value 100 --from km --to miles --verbose
+def test_convertor_verbose(capsys):
+    cli.main([
+        '--value', '100',
+        '--from', 'km',
+        '--to', 'miles',
+        '--verbose'
+    ])
+
+    assert capsys.readouterr().out == (
+        'Converting 100 km to miles\n'
+        'Resalt 62.14 miles\n'
+    )
+
+
+#case python cli.py --value 100 --from banana --to miles
+def test_unknown_unit(capsys):
+    with pytest.raises(SystemExit):
+        cli.main([
+            '--value', '100',
+            '--from', 'banana',
+            '--to', 'miles'
+        ])
+
+    assert capsys.readouterr().out == (
+        'Unknown unit\n'
+    )
+
+def test_unavailable_conversion(capsys):
+    with pytest.raises(SystemExit):
+        cli.main([
+            '--value', '100',
+            '--from', 'm',
+            '--to', 'miles',
+        ])
+
+    assert capsys.readouterr().out == (
+        'Unavailable conversion\n'
+    )
